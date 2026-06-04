@@ -22,7 +22,10 @@ def load_data():
     df["claim"] = (df["ClaimNb"].astype(float) > 0).astype(int)
     features = ["VehPower", "VehAge", "DrivAge", "BonusMalus",
                 "Area", "VehBrand", "VehGas", "Density", "Region"]
-    return df[features].copy(), df["claim"]
+    X = df[features].copy()
+    # Strip stray quotes from VehGas values (present in raw OpenML data)
+    X["VehGas"] = X["VehGas"].astype(str).str.strip("'")
+    return X, df["claim"]
 
 
 # ── Model + SHAP (cached so it only trains once) ──────────────────────────────
@@ -78,7 +81,8 @@ regions = sorted(X_raw["Region"].astype(str).unique())
 veh_power  = st.sidebar.slider("Vehicle Power",             int(X_raw["VehPower"].min()),   int(X_raw["VehPower"].max()),   6)
 veh_age    = st.sidebar.slider("Vehicle Age (years)",       int(X_raw["VehAge"].min()),     int(X_raw["VehAge"].max()),     3)
 driv_age   = st.sidebar.slider("Driver Age",                int(X_raw["DrivAge"].min()),    int(X_raw["DrivAge"].max()),    35)
-bonus_mal  = st.sidebar.slider("Bonus-Malus",               int(X_raw["BonusMalus"].min()), int(X_raw["BonusMalus"].max()), 50)
+bonus_mal  = st.sidebar.slider("Bonus-Malus",               int(X_raw["BonusMalus"].min()), int(X_raw["BonusMalus"].max()), 50,
+                               help="Claims history score: 50 = no claims (best), 100+ = prior claims (worse)")
 density    = st.sidebar.slider("Population Density (km²)",  int(X_raw["Density"].min()),    int(X_raw["Density"].max()),    500)
 area       = st.sidebar.selectbox("Area Code",       areas)
 brand      = st.sidebar.selectbox("Vehicle Brand",   brands)
@@ -120,7 +124,14 @@ shap_df = (
 col_score, col_drivers = st.columns([1, 2])
 
 with col_score:
-    st.metric("Claim Risk Score", f"{risk_score:.1%}")
+    avg_score = float(all_scores.mean())
+    delta = risk_score - avg_score
+    st.metric(
+        "Claim Risk Score",
+        f"{risk_score:.1%}",
+        delta=f"{delta:+.1%} vs portfolio avg",
+        delta_color="inverse",  # red = above avg (bad), green = below avg (good)
+    )
     st.caption("Probability this policy generates at least one claim.")
 
 with col_drivers:

@@ -25,10 +25,10 @@
 - [x] **Phase 5 — Sidebar + single prediction.** Sidebar inputs for one policy; show its risk score as a % via `st.metric`.
 - [x] **Phase 6 — Per-policy SHAP.** Show top 5 up/down drivers for the entered policy. (Handle the SHAP shape + column-reindex gotcha — PRD §5.)
 - [x] **Phase 7 — Portfolio histogram.** Histogram of all risk scores, mark the entered policy's score.
-- [ ] **Phase 8 — README + polish.** Write README (run steps, Streamlit Cloud deploy steps, limitations per PRD §9). Final pass.
+- [x] **Phase 8 — README + polish.** Write README (run steps, Streamlit Cloud deploy steps, limitations per PRD §9). Final pass.
 
 ## Next task
-➡️ **Phase 8 — README + polish.** Write README with run steps, Streamlit Cloud deploy instructions, screenshot placeholder, and honest limitations.
+✅ **All phases complete.** App is done. Optional: deploy to Streamlit Community Cloud and add a screenshot to README.
 
 ## Open questions / notes
 - If SHAP per-policy (Phase 6) blocks for more than ~30 min, ship Phase 7 first and return to it — global SHAP (Phase 4) already covers the explainability story.
@@ -36,4 +36,5 @@
 - Author will read the final code to be able to explain it in interview — favour readable code with brief comments over clever one-liners.
 
 ## Session log
-- **2026-06-04** — Built Phases 0–7 in one session. Full app working: model trains to AUC 0.6259, global SHAP bar chart, per-policy top-5 drivers, portfolio histogram, sidebar inputs. SHAP shape gotcha handled (3D array → positive-class slice). Next: Phase 8 (README + polish).
+- **2026-06-04** — Built Phases 0–7 in one session. Full app working: model trains to AUC 0.6259, global SHAP bar chart, per-policy top-5 drivers, portfolio histogram, sidebar inputs. SHAP shape gotcha handled (3D array → positive-class slice).
+- **2026-06-04** — Phase 8 complete. README written with run steps, Streamlit Cloud deploy, honest limitations. Polish: stripped quotes from VehGas values, added Bonus-Malus tooltip, added delta vs portfolio avg to risk score metric. All phases done.
