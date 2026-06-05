@@ -38,3 +38,4 @@
 ## Session log
 - **2026-06-04** — Built Phases 0–7 in one session. Full app working: model trains to AUC 0.6259, global SHAP bar chart, per-policy top-5 drivers, portfolio histogram, sidebar inputs. SHAP shape gotcha handled (3D array → positive-class slice).
 - **2026-06-04** — Phase 8 complete. README written with run steps, Streamlit Cloud deploy, honest limitations. Polish: stripped quotes from VehGas values, added Bonus-Malus tooltip, added delta vs portfolio avg to risk score metric. All phases done.
+- **2026-06-05** — Portfolio/CV polish pass (no scope change). app.py: plain-language SHAP driver labels (`humanize`), underwriting risk-tier band (`risk_tier`, 🟢→🔴), and a "How to read this dashboard" expander. README rewritten as a portfolio README (business framing, "what this demonstrates" skill table, architecture diagram, model card, roadmap, badges, screenshot placeholder). Added MIT `LICENSE`. Still single-file, no new models/data.

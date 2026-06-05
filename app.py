@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,6 +12,40 @@ from sklearn.metrics import roc_auc_score
 st.set_page_config(page_title="Insurance Risk Predictor", layout="wide")
 st.title("Insurance Risk Predictor")
 st.caption("Scores insurance policies for claim risk and explains each score using SHAP.")
+
+
+# ── Plain-language helpers (so the explanations read in English, not code) ──────
+
+FEATURE_LABELS = {
+    "VehPower":   "Vehicle power",
+    "VehAge":     "Vehicle age",
+    "DrivAge":    "Driver age",
+    "BonusMalus": "Bonus-Malus (claims history)",
+    "Density":    "Population density",
+}
+
+
+def humanize(feature: str) -> str:
+    """Turn an encoded column name into a readable label.
+    'DrivAge' -> 'Driver age';  'Region_R24' -> 'Region = R24'."""
+    if feature in FEATURE_LABELS:
+        return FEATURE_LABELS[feature]
+    if "_" in feature:                       # one-hot column, e.g. 'VehBrand_B12'
+        base, value = feature.split("_", 1)
+        return f"{FEATURE_LABELS.get(base, base)} = {value}"
+    return feature
+
+
+def risk_tier(score, scores):
+    """Band a score against the portfolio into an underwriting tier (label, emoji)."""
+    pct = (scores < score).mean()            # share of the book this policy beats
+    if pct < 0.50:
+        return "Low", "🟢"
+    if pct < 0.80:
+        return "Moderate", "🟡"
+    if pct < 0.95:
+        return "Elevated", "🟠"
+    return "High", "🔴"
 
 
 # ── Data ──────────────────────────────────────────────────────────────────────
@@ -67,6 +102,20 @@ with st.spinner("Training model — first run takes ~1 min, then cached..."):
     model, X_enc, auc, explainer, global_shap, all_scores = train_model(X_raw, y)
 
 st.info(f"ROC-AUC on held-out test set: **{auc:.3f}**  (baseline = 0.50, expect ~0.60–0.70)")
+
+with st.expander("ℹ️  How to read this dashboard"):
+    st.markdown(
+        """
+- **Score a policy** in the left sidebar — adjust the underwriting variables and the
+  app re-scores instantly.
+- **Claim Risk Score** = the model's estimated probability that this policy files at
+  least one claim, shown next to its **risk tier** relative to the whole book.
+- **Top 5 Risk Drivers** explain *this specific policy* — which factors pushed its
+  score up or down (SHAP values).
+- **Portfolio Risk Distribution** shows where this policy sits among all 100,000.
+- **Global Risk Drivers** show what matters most across the entire book.
+        """
+    )
 
 
 # ── Sidebar: enter a policy ───────────────────────────────────────────────────
@@ -134,11 +183,18 @@ with col_score:
     )
     st.caption("Probability this policy generates at least one claim.")
 
+    tier, badge = risk_tier(risk_score, all_scores)
+    pct_rank = (all_scores < risk_score).mean()
+    st.markdown(f"### {badge} {tier} risk")
+    st.caption(f"Riskier than {pct_rank:.0%} of the 100,000-policy book.")
+
 with col_drivers:
     st.subheader("Top 5 Risk Drivers for This Policy")
+    st.caption("How each factor moved this policy's score — most influential first.")
     for _, row in shap_df.iterrows():
-        arrow = "↑ raises risk" if row["shap"] > 0 else "↓ lowers risk"
-        st.write(f"**{row['feature']}**: {row['shap']:+.4f}  —  {arrow}")
+        arrow, effect = ("🔺", "raises risk") if row["shap"] > 0 else ("🔻", "lowers risk")
+        st.write(f"{arrow} **{humanize(row['feature'])}** — {effect}  "
+                 f"(SHAP {row['shap']:+.4f})")
 
 st.divider()
 
