@@ -3,14 +3,16 @@
 > An interactive Streamlit app that scores insurance policies for claim risk and explains **why** — every score is broken down with SHAP, for both technical and non-technical audiences.
 
 <p align="left">
+  <a href="https://insurance-risk-predictive-model-explainability-dashboard.streamlit.app/"><img alt="Live Demo" src="https://img.shields.io/badge/▶_Live_Demo-Open_App-FF4B4B?logo=streamlit&logoColor=white"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white">
-  <img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white">
   <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-RandomForest-F7931E?logo=scikitlearn&logoColor=white">
   <img alt="SHAP" src="https://img.shields.io/badge/SHAP-explainability-6A5ACD">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-green">
 </p>
 
-**🔗 Live demo:** _add your Streamlit Community Cloud link here after deploying_
+**🔗 Live demo:** **https://insurance-risk-predictive-model-explainability-dashboard.streamlit.app/**
+
+> First load may take ~30s to a minute while the app wakes up and warms its cache — then it's instant.
 
 ---
 
