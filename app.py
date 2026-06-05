@@ -121,22 +121,49 @@ with st.expander("ℹ️  How to read this dashboard"):
 # ── Sidebar: enter a policy ───────────────────────────────────────────────────
 
 st.sidebar.header("Score a Policy")
+st.sidebar.caption("Set the policy details, then read the score on the right. "
+                   "Hover the **?** next to any field for an explanation.")
+
+with st.sidebar.expander("📖  What do these fields mean?"):
+    st.markdown(
+        """
+- **Vehicle Power** — engine power rating. Higher = more powerful car.
+- **Vehicle Age** — how old the insured car is, in years.
+- **Driver Age** — age of the policyholder. Very young and very old drivers tend to be riskier.
+- **Bonus-Malus** — the driver's claims-history score. **50 = a clean record (best)**;
+  **100+ = past claims (worse)**. This is the single strongest risk signal.
+- **Population Density** — people per km² where the car is based. Cities (high density)
+  see more accidents and theft than rural areas.
+- **Area Code** — a grouped land-use band (A = most rural → F = most urban).
+- **Vehicle Brand** — the car's manufacturer group (anonymised as B1, B2, …).
+- **Fuel Type** — Diesel or Regular (petrol).
+- **Region** — the French administrative region the policy is written in (codes like R24).
+        """
+    )
 
 areas   = sorted(X_raw["Area"].astype(str).unique())
 brands  = sorted(X_raw["VehBrand"].astype(str).unique())
 gases   = sorted(X_raw["VehGas"].astype(str).unique())
 regions = sorted(X_raw["Region"].astype(str).unique())
 
-veh_power  = st.sidebar.slider("Vehicle Power",             int(X_raw["VehPower"].min()),   int(X_raw["VehPower"].max()),   6)
-veh_age    = st.sidebar.slider("Vehicle Age (years)",       int(X_raw["VehAge"].min()),     int(X_raw["VehAge"].max()),     3)
-driv_age   = st.sidebar.slider("Driver Age",                int(X_raw["DrivAge"].min()),    int(X_raw["DrivAge"].max()),    35)
+veh_power  = st.sidebar.slider("Vehicle Power",             int(X_raw["VehPower"].min()),   int(X_raw["VehPower"].max()),   6,
+                               help="Engine power rating of the car. Higher means a more powerful vehicle.")
+veh_age    = st.sidebar.slider("Vehicle Age (years)",       int(X_raw["VehAge"].min()),     int(X_raw["VehAge"].max()),     3,
+                               help="How old the insured car is, in years.")
+driv_age   = st.sidebar.slider("Driver Age",                int(X_raw["DrivAge"].min()),    int(X_raw["DrivAge"].max()),    35,
+                               help="Age of the policyholder. Very young and very old drivers tend to be riskier.")
 bonus_mal  = st.sidebar.slider("Bonus-Malus",               int(X_raw["BonusMalus"].min()), int(X_raw["BonusMalus"].max()), 50,
-                               help="Claims history score: 50 = no claims (best), 100+ = prior claims (worse)")
-density    = st.sidebar.slider("Population Density (km²)",  int(X_raw["Density"].min()),    int(X_raw["Density"].max()),    500)
-area       = st.sidebar.selectbox("Area Code",       areas)
-brand      = st.sidebar.selectbox("Vehicle Brand",   brands)
-gas        = st.sidebar.selectbox("Fuel Type",       gases)
-region     = st.sidebar.selectbox("Region",          regions)
+                               help="Claims-history score: 50 = no claims (best), 100+ = prior claims (worse). The strongest risk signal.")
+density    = st.sidebar.slider("Population Density (km²)",  int(X_raw["Density"].min()),    int(X_raw["Density"].max()),    500,
+                               help="People per km² where the car is based. Cities see more accidents and theft than rural areas.")
+area       = st.sidebar.selectbox("Area Code",       areas,
+                               help="Grouped land-use band, A (most rural) → F (most urban).")
+brand      = st.sidebar.selectbox("Vehicle Brand",   brands,
+                               help="The car's manufacturer group, anonymised as B1, B2, …")
+gas        = st.sidebar.selectbox("Fuel Type",       gases,
+                               help="Diesel or Regular (petrol).")
+region     = st.sidebar.selectbox("Region",          regions,
+                               help="The French administrative region the policy is written in (codes like R24).")
 
 
 # ── Encode the entered policy and score it ────────────────────────────────────
